@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Danh Sách Sân — AU Badminton</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    body { background: var(--gray-50); }
+    .court-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); overflow: hidden; transition: var(--transition); height: 100%; display: flex; flex-direction: column; }
+    .court-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); transform: translateY(-4px); }
+    .court-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 1px solid var(--gray-100); }
+    .court-body { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+    .court-title { font-size: 1.25rem; font-weight: 800; color: var(--gray-900); margin-bottom: 0.5rem; }
+    .court-price { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 1rem 0; }
+    .badge-vip { background: #FEF3C7; color: #B45309; border: 1px solid #FCD34D; display: inline-block; padding: 0.3em 0.8em; border-radius: 99px; font-size: 0.75rem; font-weight: 700; }
+    .badge-standard { background: #F3F4F6; color: #4B5563; border: 1px solid #E5E7EB; display: inline-block; padding: 0.3em 0.8em; border-radius: 99px; font-size: 0.75rem; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <nav class="au-navbar navbar navbar-expand-lg">
+    <div class="container">
+      <a href="index.html" class="au-logo">
+        <div class="au-logo-icon">🏸</div>
+        <div>
+          <div class="au-logo-text">AU Badminton</div>
+          <div class="au-logo-sub">SÂN CẦU LÔNG — UY TÍN #1</div>
+        </div>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <div class="d-flex align-items-center gap-3 mx-auto mt-2 mt-lg-0">
+          <a href="index.html" class="au-nav-link">Trang Chủ</a>
+          <a href="courts.html" class="au-nav-link active">Danh Sách Sân</a>
+          <a href="booking-history.html" class="au-nav-link">Lịch Đặt Sân</a>
+        </div>
+        <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
+          <a href="login.html" class="au-avatar" style="text-decoration:none;" title="Đăng nhập">K</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+    <div class="text-center mb-5">
+      <h2 style="font-weight: 800; color: var(--gray-900);">Danh Sách Sân Cầu Lông</h2>
+      <p style="color: var(--gray-500);">Lựa chọn sân phù hợp và trải nghiệm dịch vụ đẳng cấp</p>
+    </div>
+
+    <div class="row g-4" id="customerCourtsList">
+      <div class="col-12 text-center" style="color:var(--gray-400); padding: 3rem;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; margin-bottom:1rem; display:block;"></i> 
+        Đang tải dữ liệu sân từ hệ thống...
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = 'http://localhost:8080/api';
+    
+    // Tự động lấy danh sách sân từ Backend
+    async function loadCustomerCourts() {
+      try {
+        const res = await fetch(`${API}/courts`);
+        const data = await res.json();
+        
+        if (data.success) {
+          const list = document.getElementById('customerCourtsList');
+          
+          if (data.data.length === 0) {
+             list.innerHTML = '<div class="col-12 text-center text-muted">Hệ thống hiện tại chưa có sân nào hoạt động.</div>';
+             return;
+          }
+          
+          list.innerHTML = data.data.map(c => {
+            const isVip = (c.court_type || '').toLowerCase().includes('vip');
+            const badge = isVip ? '<span class="badge-vip">⭐ Yonex VIP</span>' : '<span class="badge-standard">Standard</span>';
+            const imgStr = isVip ? 'assets/img/court_vip.png' : 'assets/img/court_standard.png';
+            const price = Number(c.price_per_hour || 100000).toLocaleString('vi-VN');
+
+            return `
+              <div class="col-md-6 col-lg-3">
+                <div class="court-card">
+                  <img src="${imgStr}" alt="${c.name}" class="court-img" onerror="this.src='https://placehold.co/600x400/f3f4f6/a1a1aa?text=Court'"/>
+                  <div class="court-body">
+                    <h3 class="court-title">${c.name}</h3>
+                    <div style="margin-bottom:0.5rem;">${badge}</div>
+                    <div class="court-price">${price}đ <span style="font-size:0.9rem;color:var(--gray-400);font-weight:500;">/ giờ</span></div>
+                    
+                    <div style="margin-top:auto;">
+                      <a href="court-detail.html?id=${c.court_id}" class="btn-au-primary w-100 text-center" style="display:block; padding:0.75rem;">Đặt Sân Ngay</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        document.getElementById('customerCourtsList').innerHTML = '<div class="col-12 text-center text-danger"><i class="fa-solid fa-triangle-exclamation"></i> Không thể kết nối đến máy chủ Java.</div>';
+      }
+    }
+
+    loadCustomerCourts();
+  </script>
+</body>
+</html>

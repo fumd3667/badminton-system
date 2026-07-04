@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lịch Sử Đặt Sân — AU Badminton</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    body { background: var(--gray-50); }
+    .stat-box { border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; background: white; }
+    .stat-num { font-size: 2rem; font-weight: 800; line-height: 1; margin-bottom: 0.25rem; }
+    .stat-lbl { font-size: 0.75rem; color: var(--gray-400); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
+    
+    .history-card { border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1.25rem; display: flex; align-items: center; gap: 1.5rem; background: white; margin-bottom: 1rem; transition: var(--transition); flex-wrap: wrap; }
+    .history-card:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+    
+    .date-block { background: var(--gray-50); border-radius: var(--radius-md); padding: 0.75rem; text-align: center; min-width: 80px; border: 1px solid var(--gray-100); }
+    .date-day { font-size: 1.8rem; font-weight: 800; color: var(--primary); line-height: 1; margin-bottom: 2px; }
+    .date-month { font-size: 0.8rem; font-weight: 700; color: var(--gray-500); text-transform: uppercase; }
+    .date-year { font-size: 0.7rem; color: var(--gray-400); }
+    
+    .badge-stt { padding: 0.4em 0.8em; border-radius: 6px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+    .stt-pending { background: #FEF3C7; color: #B45309; }
+    .stt-confirmed { background: #DCFCE7; color: #15803D; }
+    .stt-cancelled { background: #FEE2E2; color: #B91C1C; }
+    
+    .btn-action { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--gray-200); background: white; color: var(--gray-600); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+    .btn-action:hover { background: var(--gray-100); }
+    .btn-action.cancel:hover { background: #FEE2E2; color: #B91C1C; border-color: #FCA5A5; }
+
+    .tab-btn { background: none; border: none; padding: 0.5rem 1rem; font-weight: 600; color: var(--gray-500); border-bottom: 2px solid transparent; transition: 0.2s; }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+  </style>
+</head>
+<body>
+  <nav class="au-navbar navbar navbar-expand-lg">
+    <div class="container">
+      <a href="index.html" class="au-logo"><div class="au-logo-icon">🏸</div><div><div class="au-logo-text">AU Badminton</div><div class="au-logo-sub">SÂN CẦU LÔNG — UY TÍN #1</div></div></a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <div class="d-flex align-items-center gap-3 mx-auto mt-2 mt-lg-0">
+          <a href="index.html" class="au-nav-link">Trang Chủ</a>
+          <a href="courts.html" class="au-nav-link">Danh Sách Sân</a>
+          <a href="booking-history.html" class="au-nav-link active">Lịch Đặt Sân</a>
+        </div>
+        <div class="d-flex align-items-center gap-3 mt-2 mt-lg-0">
+          <a href="login.html" class="au-avatar" style="text-decoration:none;" title="Tài khoản">K</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div style="background: white; border-bottom: 1px solid var(--gray-200); padding: 2rem 0 0;">
+    <div class="container">
+      <div style="font-size:0.85rem;color:var(--gray-400);margin-bottom:0.5rem;">
+        <a href="index.html" style="color:inherit;text-decoration:none;">Trang Chủ</a> <i class="fa-solid fa-chevron-right mx-1" style="font-size:0.6rem;"></i> <span style="color:var(--primary);font-weight:600;">Lịch Đặt Của Tôi</span>
+      </div>
+      <h2 style="font-weight: 800; color: var(--gray-900);">Lịch Sử Đặt Sân</h2>
+      <p style="color: var(--gray-500); margin-bottom: 2rem;">Quản lý tất cả các lịch đặt sân của bạn tại AU Badminton.</p>
+      
+      <div class="row g-3 mb-4">
+        <div class="col"><div class="stat-box"><div class="stat-num" id="statTotal" style="color:var(--gray-800);">0</div><div class="stat-lbl">Tổng Lịch Đặt</div></div></div>
+        <div class="col"><div class="stat-box"><div class="stat-num" id="statConfirmed" style="color:var(--primary);">0</div><div class="stat-lbl">Đã Xác Nhận</div></div></div>
+        <div class="col"><div class="stat-box"><div class="stat-num" id="statPending" style="color:#B45309;">0</div><div class="stat-lbl">Chờ Xử Lý</div></div></div>
+        <div class="col"><div class="stat-box"><div class="stat-num" id="statCancelled" style="color:#B91C1C;">0</div><div class="stat-lbl">Đã Hủy</div></div></div>
+        <div class="col"><div class="stat-box"><div class="stat-num" id="statHours" style="color:var(--gray-800);">0h</div><div class="stat-lbl">Tổng Giờ Chơi</div></div></div>
+      </div>
+
+      <div class="d-flex border-bottom" id="tabContainer">
+        <button class="tab-btn active" onclick="setTab('all')">Tất Cả (<span id="tabCountAll">0</span>)</button>
+        <button class="tab-btn" onclick="setTab('confirmed')">Xác Nhận (<span id="tabCountConf">0</span>)</button>
+        <button class="tab-btn" onclick="setTab('pending')">Chờ Duyệt (<span id="tabCountPend">0</span>)</button>
+        <button class="tab-btn" onclick="setTab('cancelled')">Đã Hủy (<span id="tabCountCanc">0</span>)</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-top: 2rem; padding-bottom: 5rem;">
+    <div id="bookingList">
+      <div class="text-center py-5" style="color:var(--gray-400);">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;margin-bottom:1rem;display:block;"></i>
+        Đang tải dữ liệu lịch sử từ máy chủ...
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <a href="courts.html" class="btn-au-primary"><i class="fa-solid fa-calendar-plus me-2"></i> Đặt Thêm Sân Mới</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API = 'http://localhost:8080/api';
+    let myBookings = [];
+    let currentTab = 'all';
+
+    // Hàm tính số giờ chơi
+    function calculateHours(start, end) {
+      if(!start || !end) return 0;
+      const [sh, sm] = start.split(':').map(Number);
+      const [eh, em] = end.split(':').map(Number);
+      return ((eh * 60 + em) - (sh * 60 + sm)) / 60;
+    }
+
+    async function loadMyHistory() {
+      // Xác thực người dùng
+      const userStr = sessionStorage.getItem('au_user');
+      if (!userStr) {
+        alert('⚠️ Vui lòng đăng nhập để xem lịch sử đặt sân!');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const user = JSON.parse(userStr);
+      
+      // Đồng bộ Icon Header
+      const avatarEl = document.querySelector('.au-avatar');
+      if (avatarEl) avatarEl.textContent = (user.fullname || 'K')[0].toUpperCase();
+
+      try {
+        // Gọi API lấy toàn bộ danh sách (Do Backend chưa làm API tìm theo ID User)
+        const res = await fetch(`${API}/bookings`);
+        const data = await res.json();
+        
+        if (data.success) {
+          // LỌC DỮ LIỆU ĐÚNG CỦA KHÁCH HÀNG NÀY (Dựa vào Tên hoặc SĐT)
+          myBookings = data.data.filter(b => 
+            (user.phone && b.customer_phone === user.phone) || 
+            (b.customer_name === user.fullname)
+          );
+          
+          updateDashboardStats();
+          renderList();
+        }
+      } catch (err) {
+        document.getElementById('bookingList').innerHTML = '<div class="text-center text-danger py-5"><i class="fa-solid fa-triangle-exclamation fa-2x mb-3"></i><br>Không thể kết nối đến máy chủ.</div>';
+      }
+    }
+
+    function updateDashboardStats() {
+      let conf = 0, pend = 0, canc = 0, totalHours = 0;
+      
+      myBookings.forEach(b => {
+        if (b.status === 'CONFIRMED') {
+          conf++;
+          totalHours += calculateHours(b.start_time, b.end_time);
+        }
+        else if (b.status === 'PENDING') pend++;
+        else if (b.status === 'CANCELLED') canc++;
+      });
+
+      document.getElementById('statTotal').textContent = myBookings.length;
+      document.getElementById('statConfirmed').textContent = conf;
+      document.getElementById('statPending').textContent = pend;
+      document.getElementById('statCancelled').textContent = canc;
+      document.getElementById('statHours').textContent = totalHours.toFixed(1) + 'h';
+
+      document.getElementById('tabCountAll').textContent = myBookings.length;
+      document.getElementById('tabCountConf').textContent = conf;
+      document.getElementById('tabCountPend').textContent = pend;
+      document.getElementById('tabCountCanc').textContent = canc;
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderList();
+    }
+
+    function renderList() {
+      const listDiv = document.getElementById('bookingList');
+      
+      let filtered = myBookings;
+      if (currentTab !== 'all') {
+        filtered = myBookings.filter(b => b.status.toLowerCase() === currentTab);
+      }
+
+      if (filtered.length === 0) {
+        listDiv.innerHTML = `<div class="text-center py-5" style="color:var(--gray-400); background:white; border-radius:var(--radius-lg); border:1px dashed var(--gray-300);">
+          <i class="fa-regular fa-calendar-xmark fa-3x mb-3"></i><br>Bạn chưa có lịch đặt sân nào ở mục này.
+        </div>`;
+        return;
+      }
+
+      listDiv.innerHTML = filtered.map(b => {
+        // Tách ngày tháng
+        const dObj = new Date(b.date);
+        const day = String(dObj.getDate()).padStart(2, '0');
+        const month = 'Th' + (dObj.getMonth() + 1);
+        const year = dObj.getFullYear();
+
+        const sTime = b.start_time.substring(0, 5);
+        const eTime = b.end_time.substring(0, 5);
+        const hours = calculateHours(b.start_time, b.end_time).toFixed(1);
+        const total = Number(b.grand_total || b.court_amount || 0).toLocaleString('vi-VN');
+        
+        let statusBadge = '';
+        let cancelBtn = '';
+        
+        if (b.status === 'CONFIRMED') {
+          statusBadge = `<span class="badge-stt stt-confirmed"><i class="fa-solid fa-check"></i> XÁC NHẬN</span>`;
+          // Nếu đã xác nhận mà chưa tới giờ chơi thì vẫn cho phép Hủy
+          cancelBtn = `<button class="btn-action cancel" onclick="cancelMyBooking(${b.booking_id})" title="Hủy lịch này"><i class="fa-solid fa-xmark"></i></button>`;
+        } else if (b.status === 'PENDING') {
+          statusBadge = `<span class="badge-stt stt-pending"><i class="fa-solid fa-hourglass-half"></i> CHỜ DUYỆT</span>`;
+          cancelBtn = `<button class="btn-action cancel" onclick="cancelMyBooking(${b.booking_id})" title="Hủy lịch này"><i class="fa-solid fa-xmark"></i></button>`;
+        } else {
+          statusBadge = `<span class="badge-stt stt-cancelled"><i class="fa-solid fa-ban"></i> ĐÃ HỦY</span>`;
+        }
+
+        // Định dạng Icon Payment
+        let payText = 'Tiền Mặt';
+        if (b.payment_method === 'VNPAY') payText = 'VNPay';
+        if (b.payment_method === 'MOMO') payText = 'MoMo';
+        if (b.payment_method === 'BANK_TRANSFER') payText = 'Quét QR';
+
+        return `
+          <div class="history-card">
+            <div class="date-block">
+              <div class="date-day">${day}</div>
+              <div class="date-month">${month}</div>
+              <div class="date-year">${year}</div>
+            </div>
+            
+            <div style="flex:1;">
+              <div style="font-size:0.75rem;font-family:monospace;color:var(--gray-400);font-weight:700;">#BK-${String(b.booking_id).padStart(5,'0')}</div>
+              <h4 style="font-size:1.1rem;font-weight:800;color:var(--gray-900);margin:0.25rem 0;">${b.court_name}</h4>
+              <div style="display:flex;gap:1rem;font-size:0.8rem;color:var(--gray-500);font-weight:600;flex-wrap:wrap;">
+                <span><i class="fa-regular fa-clock me-1"></i> ${sTime} – ${eTime}</span>
+                <span><i class="fa-solid fa-stopwatch me-1"></i> ${hours} giờ</span>
+                <span><i class="fa-solid fa-wallet me-1"></i> ${payText}</span>
+              </div>
+            </div>
+
+            <div style="text-align:right; min-width: 120px;">
+              <div style="font-size:0.7rem;color:var(--gray-400);text-transform:uppercase;letter-spacing:0.05em;font-weight:700;">Tổng tiền</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--gray-900);">${total}đ</div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              ${statusBadge}
+              ${cancelBtn}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Tính năng Khách hàng tự hủy đơn
+    async function cancelMyBooking(id) {
+      if (!confirm('Bạn có chắc chắn muốn hủy lịch đặt sân này không?')) return;
+
+      try {
+        const res = await fetch(`${API}/bookings/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'CANCELLED' })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          alert('✅ Đã hủy lịch thành công!');
+          loadMyHistory(); // Tải lại dữ liệu mới nhất
+        } else {
+          alert('❌ Có lỗi xảy ra: ' + data.message);
+        }
+      } catch (err) {
+        alert('❌ Lỗi kết nối đến máy chủ.');
+      }
+    }
+
+    // Khởi chạy khi vào trang
+    loadMyHistory();
+  </script>
+</body>
+</html>
